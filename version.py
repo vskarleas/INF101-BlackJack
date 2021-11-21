@@ -29,7 +29,7 @@ def valueCard(card):
     elif "Q" in value or "K" in value or "J" in value:
         return 10
     elif "A" in value:
-        choice = int(input('How do you want to value the ' + str(card[0]) + ' (1/11) :'))
+        choice = int(input('How do you want to value the ' + str(card[0]) + ' (1/11) :')) # Maybe do not decide here but in the beginning of the game
         if choice == 1:
             return 1
         if choice == 11:
@@ -45,9 +45,18 @@ def initStack(n):
     return finalDeck
 
 def drawCard(p,x):
-    #I need some clarification
-    return
-    
+    if len(p) == 1 or x=='':
+        return p
+    elif len(p) < x:
+        return p
+    elif x == 1:
+        var =  p[0]
+        p = list(var)
+        return p
+    else: 
+        for i in range((len(p)-(x-1))-1):
+            p.pop(x)
+        return p
 
 def initPlayers(n):
     players = []
@@ -105,6 +114,10 @@ def continues():
             print("I dont understand your input. Please type go or stop")
             choice = str(input("go/stop ? "))
 
+def playerTurn(j): #j is the name of the palyer (maybe comes from the function initPlayers)
+    return
+
+
 
 def gameTurn():
     #I haven't written this function. After this function
@@ -138,3 +151,27 @@ def completeGame():
     #victories (in the corresponding dictionary). For the moment, 
     #the winner gets 1 point for the victory, and the other 
     #players get 0.
+
+
+#B3 Main Program
+n = int(input("Number of players ? "))
+replay = True
+id = 1
+print("Let's personalize the game a little bit.")
+players = initPlayers(n)
+while replay == True:
+    cardsDeck = initStack(n)
+    print("Cards deck is generated. Here is your initial score")
+    scores = (firstTurn(players))
+    print(scores) #We will remove it once we finish with the set up. I just added as a verification that things work
+    #The rest of the program to play a game one time goes here
+    choice = str(input("Do you want to play again ? (yes/no) "))
+    if choice == "no":
+        replay = False
+        id = id +1
+    else:
+        replay == True
+print("==========")
+print("You played in total ", id, "games")
+print("The winner in all the games is the one with the biggest score (money gained).")
+print("Winner: ", winner(scores)) #The scores dictionary is changing during the game though the functions. This section in the main program isn't created yet.
