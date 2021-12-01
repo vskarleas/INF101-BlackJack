@@ -67,7 +67,7 @@ def initPlayers(n):
         players.append(name)
     return players
 
-def initScores(players,v):
+def initScores(players,v=0):
     if v != 0:
         dictionary = dict.fromkeys(players, v)
     else:
@@ -114,8 +114,13 @@ def continues():
         else:
             print("I dont understand your input. Please type go or stop")
             choice = str(input("go/stop ? "))
+    return default
 
-def playerTurn(j): #j is the name of the palyer (maybe comes from the function initPlayers)
+def playerTurn(j): #Needs to be continued
+    play = 1
+    while play > 0:
+        #points and ids variables are not defined
+        print("j, this is your", ids, "game. You have ", points, "total points.")
     return
 
 
