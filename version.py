@@ -30,6 +30,7 @@ def valueCard(card):
     elif "Q" in value or "K" in value or "J" in value:
         return 10
     elif "A" in value:
+        return 1, 11
         choice = int(input('How do you want to value the ' + str(card[0]) + ' (1/11) :')) # Maybe do not decide here but in the beginning of the game
         if choice == 1:
             return 1
