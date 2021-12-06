@@ -62,8 +62,15 @@ def initPlayers(n):
     players = []
     id = 1
     for id in range(n):
-        name = str(input('Name of player ' + str(id+1) + ': '))
-        players.append(name)
+        while True:
+            name = str(input('Name of player ' + str(id+1) + ': '))
+            if name != '':
+                players.append(name)
+                print("Nice to meet you ", name,"!", sep="")
+                break
+            else:
+                print('Please, tell me your name.')
+    print("We are ready. Let's start!\n")
     return players
 
 #This creates the dictionary that we are using in all the functions below
