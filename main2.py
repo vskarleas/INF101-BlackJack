@@ -1,7 +1,7 @@
 import random
 import sys
 
-Deck = {'Ace': 1, 'Two': 2, 'Three': 3, 'Four': 4, 'Five': 5, 'Six': 6, 'Seven': 7, 'Eight': 8, 'Nine': 9, 'Ten': 10,
+Deck = {'Ace': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10,
         'Jack': 10, 'Queen': 10, 'King': 10}
 Suit = ['of Clubs', 'of Spades', 'of Hearts', 'of Diamonds']
 Croupier = {'Name': 'MAX', 'Deck1': [], 'c_values1': [], 'Play': True, 'Ace': False, 'BJ': False, 'Score1': 0}
@@ -313,6 +313,7 @@ def drawCard(quantity, player, deck, deck_value):  # draw x cards and add to a d
 def cardVisualization(card):
     cardOutput = card[0]
     elem = []
+    elem.clear()
     if "Hearts" in card:
         elem.append("♥")
     elif "Diamonds" in card:
@@ -339,19 +340,28 @@ def cardVisualization(card):
         elem.append("9")
     elif "10" in cardOutput:
         elem.append("10")
-    elif "Jack" in cardOutput:
+    elif "Jack" in card:
         elem.append("J")
-    elif "Queen" in cardOutput:
+    elif "Queen" in card:
         elem.append("Q")
-    elif "Ace" in cardOutput:
+    elif "Ace" in card:
         elem.append("A")
-    elif "King" in cardOutput:
+    elif "King" in card:
         elem.append("K")
+    else:
+        elem.append("?")
     return elem
 
 def print_deck(player, deck):
     for card in player[deck]:
-        print("- " + card)
+        identifiers = cardVisualization(card)
+        print('┌───────┐')
+        print(f'| {identifiers[0]}     |')
+        print('|       |')
+        print(f'|   {identifiers[1]}   |')
+        print('|       |')
+        print(f'|    {identifiers[0]}  |')
+        print('└───────┘') 
 
 #===========
 #Essential callable functions that determine the game
@@ -388,11 +398,10 @@ def hit_stand(player, deck, deck_value, score, state):
             player[state] = False
         elif val <= 21:
             while True:
-                print("What do you want to do, hit or stand?")
-                choice = input("h/s: ")
-                if choice not in ['h', 's']:
+                choice = input("What do you want to do, hit or stand? ")
+                if choice not in ['hit', 'stand']:
                     print('Enter a valid input.')
-                if choice == 's':
+                if choice == 'stand':
                     player[state] = False
                     if player['Ace'] and (val + 10) <= 21:
                         player[score] = val + 10
@@ -401,7 +410,7 @@ def hit_stand(player, deck, deck_value, score, state):
                     else:
                         player[score] = val
                     break
-                elif choice == 'h':
+                elif choice == 'hit':
                     drawCard(1, player, deck, deck_value)
                     break
 
