@@ -13,7 +13,6 @@ Config = {'Number of players': 0, 'Money': 100, 'Minimum_bet': 5, 'show': True, 
 used_cards = {}
 Croupier_names = ['Max', 'Ilias', 'Joey', 'Jenk', 'Asher', 'Sophie', 'Johnny', 'Iris', 'Kennedy', 'Nike']
 
-
 def startGame():
     Croupier['Name'] = random.choice(Croupier_names)
     print("Hello, my name is {}. I'll be your Croupier for this session.".format(Croupier['Name']))
@@ -68,7 +67,6 @@ def numberPlayers():
             Players.setdefault(new_player, template_new) #FRom python docs: The setdefault() method returns the value of the item with the specified key. If the key does not exist, insert the key, with the specified value
             Players[new_player].setdefault('Deck1', [])
             Players[new_player].setdefault('c_values1', [])
-        pause()
         initPlayers()
     else:
         print('Enter a valid input.')
@@ -88,7 +86,6 @@ def initPlayers():
     print("We are ready. Let's start!")
     betting()
 
-
 def betting():
     Config['game'] = Config['game'] + 1 #The 
     print('\nGame number {}'.format(Config['game']))
@@ -100,7 +97,7 @@ def betting():
                 print('My turn is over. I introduce you to your new croupier, {}'.format(Croupier['Name']))
                 print('Have fun!\n')
                 break
-    print('\nBetting round')
+    print('\nTime to give your bets')
     for x in Players:
         if Players[x]['Active']:
             while True:
@@ -112,9 +109,7 @@ def betting():
                     break
     firstTurn()
 
-
 def firstTurn():
-    # round_number = 1 draw 2 cards and check for Blackjack, doubles, deck value
     for x in Players:
         if Players[x]['Active']:
             drawCard(2, Players[x], 'Deck1', 'c_values1')
@@ -125,11 +120,8 @@ def firstTurn():
             print_deck(Players[x], 'Deck1')
     if Config['show']:
         print("The croupier, {}, has {} and one hidden card.".format(Croupier['Name'], Croupier['Deck1'][0]))
-        if Croupier['c_values1'][0] == 'Ace':  # Croupier might have Blackjack
-            insurance()
     else:
         print("The croupier, {}, has two hidden cards.".format(Croupier['Name']))
-    pause()
     for x in Players:
         if Players[x]['Active'] and Players[x]['Play']:  # Check for Blackjack first on both sides
             player = Players[x]
@@ -138,27 +130,14 @@ def firstTurn():
                 player['BJ'] = True
                 print("Congratulations {}! You have Blackjack!".format(player['Name']))
                 player['Play'] = False
-                pause()
             cards = Croupier['c_values1']
             if (cards[0] == 'Ace' and Deck.get(cards[1]) == 10) or (Deck.get(cards[0]) == 10 and cards[1] == 'Ace'):
                 Croupier['BJ'] = True
                 print('I have Blackjack!')
                 print_deck(Croupier, 'Deck1')
-                pause()
                 winner()  # if Croupier has blackjack, no need to look more
-    for x in Players:
-        if Players[x]['Active'] and Players[x]['Play']:
-            player = Players[x]
-            if player['c_values1'][0] == player['c_values1'][1] and valueCardSum(player['c_values1']) in [9, 10, 11]:
-                print(
-                    '\n{}. It seems you can double your bet and split your hand. Be wary, you can only do one!'.format(
-                        player['Name']))
-            if valueCardSum(player['c_values1']) in [9, 10, 11]:
-                double_bet(Players[x])
     for n in Players:
         player = Players[n]
-        if player['c_values1'][0] == player['c_values1'][1] and player['Play']:  # and len(player['c_values1']) == 2
-            split_deck(player)
         hit_stand(Players[n], 'Deck1', 'c_values1', 'Score1', 'Play')
         if Players[n].get('Double'):
             hit_stand(Players[n], 'Deck2', 'c_values2', 'Score2', 'Double')
@@ -196,12 +175,9 @@ def croupier():
         elif val < 17:
             print('I hit for another card.')
             drawCard(1, Croupier, 'Deck1', 'c_values1')
-        pause()
     winner()
 
-
 def winner():
-    # Check if there is any blackjack, if not check for player closer to 21
     for x in Players:
         if Players[x]['Active']:
             player = Players[x]
@@ -260,11 +236,9 @@ def winner():
                     if player.get('Score2', 0) > 21:
                         player['Money'] -= player['Bet']
                         print("Sorry, {}. You lost {}¢ from hand #2.".format(player['Name'], player['Bet'], ))
-    pause()
     goodbye()
 
-
-def goodbye():  # Check funds available to players, ask if anyone would like to leave and reset the game
+def goodbye():
     for x in Players:
         if Players[x]['Money'] < Config['Minimum_bet'] and Players[x]['Active']:
             print("Sorry, {}. You don't have enough funds to cover minimum bet. You only have left {}¢.".format(
@@ -277,7 +251,6 @@ def goodbye():  # Check funds available to players, ask if anyone would like to 
             inactive += 1
             if inactive == Config['Number of players']:
                 print('No active players left. Thanks for playing!')
-                pause()
                 sys.exit()
     print('If any player would like to withdraw, please type your name. Leave it blank and we will continue with the '
           'next game.')
@@ -314,27 +287,14 @@ def goodbye():  # Check funds available to players, ask if anyone would like to 
         print('No player found with the name {}.'.format(out))
         goodbye()
 
-#=====================
 
-
-
-def valueCardSum(card_values):
-    # Total value of player's deck
-    sum_card = 0
-    for y in card_values:
-        sum_card += Deck.get(y)
-    return sum_card
-
-
-def drawCard(quantity, player, deck, deck_value):
-    # draw x cards and add to a dict so can keep track of each card == no repeated card
+def drawCard(quantity, player, deck, deck_value):  # draw x cards and add to a dict so can keep track of each card in ordr no to have repeated card
     if Config['deck_size'] > (40 * Config['max_deck']):
         left = (12 * Config['max_deck'])
         print('\nOnly {} cards left in the deck!'.format(left))
         print('Time for reshuffling!')
         used_cards.clear()
         Config['deck_size'] = 0
-        pause()
     for x in range(quantity):
         while True:
             card_value = random.choice(list(Deck.keys()))
@@ -347,95 +307,60 @@ def drawCard(quantity, player, deck, deck_value):
                 Config['deck_size'] += 1
                 break
 
+#=====================
+#Graphical Design Interface UI
 
-
-
-
-
-
-
-
-
-
-
-
-
-def insurance():
-    print('\n{} has an Ace as first card.'.format(Croupier['Name']))
-    for x in Players:
-        while True:
-            bet_half = Players[x]['Bet'] // 2
-            if Players[x]['Money'] >= (Players[x]['Bet'] + bet_half):
-                print("{} would you like adding insurance?".format(Players[x]['Name']))
-                print("It can go from 0, up to {}¢.".format(bet_half))
-                answer = input('#: ')
-                if answer.isdigit() and 0 <= int(answer) <= bet_half:
-                    Players[x]['half_bet'] = int(answer)
-                    print('Bet updated')
-                    Players[x]['insurance'] = True
-                    break
-                else:
-                    print('Enter a valid input, between 0 and {}.'.format(bet_half))
-            elif Players[x]['Money'] > Players[x]['Bet']:  # Player's bet + half will be over player's money
-                print("{} would you like adding insurance?".format(Players[x]['Name']))
-                rest = Players[x]['Money'] - Players[x]['Bet']
-                print("It can go from 0, up to {}¢.".format(rest))
-                answer = input('#: ')
-                if answer.isdigit() and 0 <= int(answer) <= rest:
-                    Players[x]['half_bet'] = int(answer)
-                    print('Bet updated')
-                    Players[x]['insurance'] = True
-                    break
-                else:
-                    print('Enter a valid input, between 0 and {}.'.format(rest))
-            else:
-                print("{}. You don't have enough money for insurance.".format(Players[x]['Name']))
-                pause()
-                break
-
-
-def pause():
-    input('Press Enter when you are ready\n')
-
-
-def double_bet(player):
-    if player['Money'] >= (player['Bet'] * 2):
-        val = valueCardSum(player['c_values1'])
-        print('\n{}. Your hand is worth {}.'.format(player['Name'], val))
-        print_deck(player, 'Deck1')
-        print('You can double down your bet if you want. You will draw just one additional card if you agree.')
-        while True:
-            print('Do you want your bet to be {}?'.format((player['Bet'] * 2)))
-            yes_no = input("y/n: ")
-            if yes_no not in ['y', 'n']:
-                print('Please, enter a valid input.')
-            if yes_no == 'y':
-                player['Bet'] = player['Bet'] * 2
-                drawCard(1, player, 'Deck1', 'c_values1')
-                print('Your cards are:')
-                print_deck(player, 'Deck1')
-                for card_v in player['c_values1']:
-                    if card_v == 'Ace':
-                        player['Ace'] = True
-                player['Play'] = False
-                val = valueCardSum(player['c_values1'])
-                if player['Ace'] and (val + 10) <= 21:
-                    player['Score1'] = val + 10
-                    print('Its value is: {}'.format(val + 10))
-                elif player['Ace'] and (val + 10) > 21:
-                    player['Score1'] = val
-                    print('Its value is: {}'.format(val))
-                else:
-                    player['Score1'] = val
-                    print('Its value is: {}'.format(val))
-                pause()
-                break
-            elif yes_no == 'n':
-                break
+def cardVisualization(card):
+    cardOutput = card[0]
+    elem = []
+    if "Hearts" in card:
+        elem.append("♥")
+    elif "Diamonds" in card:
+        elem.append("♦")
+    elif "Spades" in card:
+        elem.append("♠")
     else:
-        print("{}. You don't have enough funds for doubling down your bet.".format(player['Name']))
-        pause()
+        elem.append("♣")
+    if "2" in cardOutput:
+        elem.append("2")
+    elif "3" in cardOutput:
+        elem.append("3")
+    elif "4" in cardOutput:
+        elem.append("4")
+    elif "5" in cardOutput:
+        elem.append("5")
+    elif "6" in cardOutput:
+        elem.append("6")
+    elif "7" in cardOutput:
+        elem.append("7")
+    elif "8" in cardOutput:
+        elem.append("8")
+    elif "9" in cardOutput:
+        elem.append("9")
+    elif "10" in cardOutput:
+        elem.append("10")
+    elif "Jack" in cardOutput:
+        elem.append("J")
+    elif "Queen" in cardOutput:
+        elem.append("Q")
+    elif "Ace" in cardOutput:
+        elem.append("A")
+    elif "King" in cardOutput:
+        elem.append("K")
+    return elem
 
+def print_deck(player, deck):
+    for card in player[deck]:
+        print("- " + card)
+
+#===========
+#Essential callable functions that determine the game
+
+def valueCardSum(card_values): #Total value of player's deck
+    sum_card = 0
+    for y in card_values:
+        sum_card += Deck.get(y)
+    return sum_card
 
 def show_card_value(player, deck, deck_value):
     print('Your cards are:')
@@ -452,11 +377,6 @@ def show_card_value(player, deck, deck_value):
         print('Its value is: {}'.format(val))
 
 
-def print_deck(player, deck):
-    for card in player[deck]:
-        print("- " + card)
-
-
 def hit_stand(player, deck, deck_value, score, state):
     while player['Active'] and player[state]:
         val = valueCardSum(player[deck_value])
@@ -466,7 +386,6 @@ def hit_stand(player, deck, deck_value, score, state):
             print("Bust! Your hand is over 21.")
             player[score] = val
             player[state] = False
-            pause()
         elif val <= 21:
             while True:
                 print("What do you want to do, hit or stand?")
@@ -486,51 +405,7 @@ def hit_stand(player, deck, deck_value, score, state):
                     drawCard(1, player, deck, deck_value)
                     break
 
-
-def split_deck(player):
-    if player['Money'] >= (player['Bet'] * 2):
-        print('\n{}, you can split your pair in two different hands.'.format(player['Name']))
-        show_card_value(player, 'Deck1', 'c_values1')
-        while True:
-            print('Do you want two hands to play with?')
-            answer_double = input("y/n: ").lower()
-            if answer_double not in ['y', 'n']:
-                print('Enter a valid input')
-            elif answer_double == 'y':
-                player['Double'] = True
-                player.setdefault('Deck2', [])
-                player.setdefault('c_values2', [])
-                player.setdefault('Score2', 0)
-                player['c_values2'].append(player['c_values1'][1])
-                player['c_values1'].pop()
-                player['Deck2'].append(player['Deck1'][1])
-                player['Deck1'].pop()
-                if player['c_values1'][0] == 'Ace':
-                    print('Since your hand contains an Ace, you can only draw one additional card.')
-                    print('{}. This is hand #1:'.format(player['Name']))
-                    double_ace(player, 'Deck1', 'c_values1', 'Score1')
-                    print('{}. This is hand #2:'.format(player['Name']))
-                    double_ace(player, 'Deck2', 'c_values2', 'Score2')
-                    player['Play'] = False
-                    player['Double'] = False
-                    pause()
-                break
-            elif answer_double == 'n':
-                break
-    else:
-        print("{}. You don't have enough funds for playing two hands.".format(player['Name']))
-        pause()
-
-
-def double_ace(player, deck, value, score):
-    drawCard(1, player, deck, value)
-    print_deck(player, deck)
-    val = valueCardSum(player[deck])
-    player[score] = val + 10
-
-
-
-
-
+#Inspired by the program on Caseine and TP 5 that we show this
+#It activates the object-ariented function that handles the flow of the game
 if __name__ == "__main__":
-    startGame()
+    startGame() #Very important
