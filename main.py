@@ -171,18 +171,18 @@ def winner(scores):
 
 def continues(): #It is like withdraw
     default = True
-    print("Do you want to continue the game or to stop ?")
-    choice = str(input("go/stop ? "))
+    print("Do you want to continue the game ?")
+    choice = str(input("yes/no : "))
     while default == True:
-        if choice == "stop":
+        if choice == "no":
             default = False
             return False
-        elif choice == "go":
+        elif choice == "yes":
             default = False
             return True
         else:
-            print("I dont understand your input. Please type go or stop")
-            choice = str(input("go/stop ? "))
+            print("I dont understand your input. Please type if you wamnt to continue teh game")
+            choice = str(input("yes/no : "))
 
 
 def playerTurn(j, players):
@@ -191,30 +191,37 @@ def playerTurn(j, players):
     if points<21:
         print("It's", j, "turn. You have", points, "points.")
         choice = str(input("hit/stand?"))
-        if choice == "stand":
-            return data[0], data[1]
-        elif choice == "hit": #Player continues
-            print("OK, let's continue.")
-            card = drawCard(data[1], 1)
-            data[1].remove(card)
-            print("Here is your next card:")
-            value = valueCard(card[0])
-            identifiers = cardVisualization(card)
-            print('┌───────┐')
-            print(f'| {identifiers[0]}     |')
-            print('|       |')
-            print(f'|   {identifiers[1]}   |')
-            print('|       |')
-            print(f'|    {identifiers[0]}  |')
-            print('└───────┘') 
-            res = points + value
-            if res > 21:
-                print("Unfortunately,", j,"lost since his/her points were", res)
-                data[0].pop(j)
+        while True:
+            if choice == "stand":
                 return data[0], data[1]
+                break
+            elif choice == "hit": #Player continues
+                print("OK, let's continue.")
+                card = drawCard(data[1], 1)
+                data[1].remove(card)
+                print("Here is your next card:")
+                value = valueCard(card[0])
+                identifiers = cardVisualization(card)
+                print('┌───────┐')
+                print(f'| {identifiers[0]}     |')
+                print('|       |')
+                print(f'|   {identifiers[1]}   |')
+                print('|       |')
+                print(f'|    {identifiers[0]}  |')
+                print('└───────┘') 
+                res = points + value
+                if res > 21:
+                    print("Unfortunately,", j,"lost since his/her points were", res)
+                    data[0].pop(j)
+                    return data[0], data[1]
+                    break
+                else:
+                    data[0][j] = res
+                    return data[0], data[1]
+                    break
             else:
-                data[0][j] = res
-                return data[0], data[1]
+                print("I don't understand.")
+                choice = str(input("hit/stand? "))
     else:
         print("Unfortunately,", j,"lost since his/her points were", points)
         data[0].pop(j)
@@ -223,35 +230,42 @@ def playerTurn(j, players):
 def turn(j, players, deck):
     if players[j]<21:
         print("It's", j, "turn. You have", players[j], "points.")
-        choice = str(input("hit/stand?"))
-        if choice == "stand":
-            return players, deck
-        elif choice == "hit": #Player continues
-            print("OK!")
-            card = drawCard(deck, 1)
-            deck.remove(card)
-            print("Here is your next card:")
-            value = valueCard(card[0])
-            identifiers = cardVisualization(card)
-            print('┌───────┐')
-            print(f'| {identifiers[0]}     |')
-            print('|       |')
-            print(f'|   {identifiers[1]}   |')
-            print('|       |')
-            print(f'|    {identifiers[0]}  |')
-            print('└───────┘') 
-            res = players[j] + value
-            if res > 21:
-                print("Unfortunately,", j,"lost since his/her points were", res)
-                players.pop(j)
+        choice = str(input("hit/stand? "))
+        while True:
+            if choice == "stand":
                 return players, deck
+                break
+            elif choice == "hit": #Player continues
+                print("OK!")
+                card = drawCard(deck, 1)
+                deck.remove(card)
+                print("Here is your next card:")
+                value = valueCard(card[0])
+                identifiers = cardVisualization(card)
+                print('┌───────┐')
+                print(f'| {identifiers[0]}     |')
+                print('|       |')
+                print(f'|   {identifiers[1]}   |')
+                print('|       |')
+                print(f'|    {identifiers[0]}  |')
+                print('└───────┘') 
+                res = players[j] + value
+                if res > 21:
+                    print("Unfortunately,", j,"lost since his/her points were", res)
+                    players.pop(j)
+                    return players, deck
+                    break
+                else:
+                    players[j] = res 
+                    return players, deck
+                    break
             else:
-                players[j] = res 
-                return players, deck
+                print("I don't understand.")
+                choice = str(input("hit/stand? "))
     else:
         print("Unfortunately,", j,"lost since his/her points were", players[j])
         data[0].pop(j)
-        return data[0], data[1] #1 is deck, 0 is players dictionary with scores.
+        return data[0], data[1]
 
 def gameTurn(data, players): #Receives the dictionary of players every time
     for i in range(len(list(data.keys()))):
@@ -281,40 +295,53 @@ def completeGame(data, players): #Receives the dictionary of players every time
         print("Game over")
         print("No remaining players on the game.")
     elif over == True:
-        win = winner(play[0])
-        win[1][win[0]]= win[1][win[0]]+1
-        updatedDeck = play[1]
-        players = play[0]
-        if len(list(players.keys())) > 1:
-            while id > 0:
-                print("Round no", ids + 1)
-                playing = copy.deepcopy(players)
-                for j, value in players.items():
-                    newRound = turn(j, playing, updatedDeck)
-                over = gameOver(newRound[0])
-                if over == False:
-                    print("Game over")
-                    print("No remaining players on the game.")
-                    sys.exit()
-                elif over == True:
-                    win = winner(newRound[0])
-                    win[1][win[0]]= win[1][win[0]]+1
-                    updatedDeck = newRound[1]
-                    players = newRound[0]
-                    playing = players
-                    id = id -1
-            print("We have played three rounds in total") #Of course we can write so that it repears until we have one player but this approach helped us hrough debugging proces 
-            for g in range(len(list(win[1].keys()))):
-                if max < list(win[1].values())[g]:
-                    max = list(win[1].values())[g] 
-                    person = list(win[1].keys())[g]
-            print("From the remaining", len(list(newRound[0].keys())), "players, the winner is",person, "with", max, "total victories.")
+        continueing = continues()
+        if continueing == True:
+            win = winner(play[0])
+            win[1][win[0]]= win[1][win[0]]+1
+            updatedDeck = play[1]
+            players = play[0]
+            if len(list(players.keys())) > 1:
+                while id > 0:
+                    print("Round no", ids + 1)
+                    playing = copy.deepcopy(players)
+                    for j, value in players.items():
+                        newRound = turn(j, playing, updatedDeck)
+                    over = gameOver(newRound[0])
+                    if over == False:
+                        print("Game over")
+                        print("No remaining players on the game.")
+                        sys.exit()
+                    elif over == True:
+                        win = winner(newRound[0])
+                        win[1][win[0]]= win[1][win[0]]+1
+                        updatedDeck = newRound[1]
+                        players = newRound[0]
+                        playing = players
+                        id = id -1
+                    continueing = continues()
+                    if continueing == False:
+                        print("We have played", ids,"rounds in total")
+                        for g in range(len(list(win[1].keys()))):
+                            if max < list(win[1].values())[g]:
+                                max = list(win[1].values())[g] 
+                                person = list(win[1].keys())[g]
+                        print("From the remaining", len(list(newRound[0].keys())), "players, the winner is",person, "with", max, "total victories.")
+                        print("\nThanks for playing our BlackJack game. See yoou soon, bye bye!")
+                        sys.exit()
+                print("We have played three rounds in total") #Of course we can write so that it repears until we have one player but this approach helped us hrough debugging proces 
+                for g in range(len(list(win[1].keys()))):
+                    if max < list(win[1].values())[g]:
+                        max = list(win[1].values())[g] 
+                        person = list(win[1].keys())[g]
+                print("From the remaining", len(list(newRound[0].keys())), "players, the winner is",person, "with", max, "total victories.")
+            else:
+                print("We have a winner!")
+                if max < list(win[1].values())[0]:
+                    max = list(win[1].values())[0]
+                print("The winner is", list(win[1].keys())[0], "with total victories", max)
         else:
-            print("We have a winner!")
-            if max < list(win[1].values())[0]:
-                max = list(win[1].values())[0]
-            print("The winner is ", list(win[1].keys())[0], "with total victories", max)
-#Continues not used yet
+            print("Alright, the game is terminated. Bye bye!")
 
 #Main Program
 n = int(input("How many players ? "))
