@@ -64,7 +64,7 @@ def numberPlayers():
         for x in range(1, Config['Number of players'] + 1):
             new_player = 'Player ' + str(x) #This will get personalized via the initPlayers() function
             template_new = dict(Template)
-            Players.setdefault(new_player, template_new) #FRom python docs: The setdefault() method returns the value of the item with the specified key. If the key does not exist, insert the key, with the specified value
+            Players.setdefault(new_player, template_new) #From python docs: The setdefault() method returns the value of the item with the specified key. If the key does not exist, insert the key, with the specified value
             Players[new_player].setdefault('Deck1', [])
             Players[new_player].setdefault('c_values1', [])
         initPlayers()
