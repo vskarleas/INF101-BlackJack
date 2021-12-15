@@ -129,17 +129,17 @@ def firstTurn(players):
     deck = initStack(n)
     for h in range(len(players)):
         res = 0
-        #print("For", players[h], "we have:")
+        print("For", players[h], "we have:")
         for repeat in range(2):
             card = drawCard(deck, 1)
-            #identifiers = cardVisualization(card)
-            #print('┌───────┐')
-            #print(f'| {identifiers[0]}     |')
-            #print('|       |')
-            #print(f'|   {identifiers[1]}   |')
-            #print('|       |')
-            #print(f'|    {identifiers[0]}  |')
-            #print('└───────┘') 
+            identifiers = cardVisualization(card)
+            print('┌───────┐')
+            print(f'| {identifiers[0]}     |')
+            print('|       |')
+            print(f'|   {identifiers[1]}   |')
+            print('|       |')
+            print(f'|    {identifiers[0]}  |')
+            print('└───────┘') 
             deck.remove(card)
             if valueCard(card[0]) == 1:
                 print("Your card is ",card[0], "and you need to select its value")
@@ -284,68 +284,85 @@ def gameOver(data): #Receives the dictionary of players every time
         return False
 
 def completeGame(data, players): #Receives the dictionary of players every time
-    default = False
-    max = 0
-    id = 2
-    ids = 1
-    print("Round no 1")
-    play = gameTurn(data, players)
-    over = gameOver(play[0])
-    if over == False:
-        print("Game over")
-        print("No remaining players on the game.")
-    elif over == True:
-        continueing = continues()
-        if continueing == True:
-            win = winner(play[0])
-            win[1][win[0]]= win[1][win[0]]+1
-            updatedDeck = play[1]
-            players = play[0]
-            if len(list(players.keys())) > 1:
-                while id > 0:
-                    print("Round no", ids + 1)
-                    playing = copy.deepcopy(players)
-                    for j, value in players.items():
-                        newRound = turn(j, playing, updatedDeck)
-                    over = gameOver(newRound[0])
-                    if over == False:
-                        print("Game over")
-                        print("No remaining players on the game.")
-                        sys.exit()
-                    elif over == True:
-                        win = winner(newRound[0])
-                        win[1][win[0]]= win[1][win[0]]+1
-                        updatedDeck = newRound[1]
-                        players = newRound[0]
-                        playing = players
-                        id = id -1
-                    continueing = continues()
-                    if continueing == False:
-                        print("We have played", ids,"rounds in total")
-                        for g in range(len(list(win[1].keys()))):
-                            if max < list(win[1].values())[g]:
-                                max = list(win[1].values())[g] 
-                                person = list(win[1].keys())[g]
-                        print("From the remaining", len(list(newRound[0].keys())), "players, the winner is",person, "with", max, "total victories.")
-                        print("\nThanks for playing our BlackJack game. See yoou soon, bye bye!")
-                        sys.exit()
-                print("We have played three rounds in total") #Of course we can write so that it repears until we have one player but this approach helped us hrough debugging proces 
-                for g in range(len(list(win[1].keys()))):
-                    if max < list(win[1].values())[g]:
-                        max = list(win[1].values())[g] 
-                        person = list(win[1].keys())[g]
-                print("From the remaining", len(list(newRound[0].keys())), "players, the winner is",person, "with", max, "total victories.")
+        max = 0
+        id = 2
+        ids = 1
+        print("Round no 1")
+        play = gameTurn(data, players)
+        over = gameOver(play[0])
+        if over == False:
+            print("Game over")
+            print("No remaining players on the game.")
+        elif over == True:
+            continueing = continues()
+            if continueing == True:
+                win = winner(play[0])
+                win[1][win[0]]= win[1][win[0]]+1
+                updatedDeck = play[1]
+                players = play[0]
+                if len(list(players.keys())) > 1:
+                    while id > 0:
+                        print("Round no", ids + 1)
+                        playing = copy.deepcopy(players)
+                        for j, value in players.items():
+                            newRound = turn(j, playing, updatedDeck)
+                        over = gameOver(newRound[0])
+                        if over == False:
+                            print("Game over")
+                            print("No remaining players on the game.")
+                            sys.exit()
+                        elif over == True:
+                            win = winner(newRound[0])
+                            win[1][win[0]]= win[1][win[0]]+1
+                            updatedDeck = newRound[1]
+                            players = newRound[0]
+                            playing = players
+                            id = id -1
+                        continueing = continues()
+                        if continueing == False:
+                            print("We have played", ids,"rounds in total")
+                            for g in range(len(list(win[1].keys()))):
+                                if max < list(win[1].values())[g]:
+                                    max = list(win[1].values())[g] 
+                                    person = list(win[1].keys())[g]
+                            print("From the remaining", len(list(newRound[0].keys())), "players, the winner is",person, "with", max, "total victories.")
+                            print("\nThanks for playing our BlackJack game. See yoou soon, bye bye!")
+                            break
+                    print("We have played three rounds in total")
+                    for g in range(len(list(win[1].keys()))):
+                        if max < list(win[1].values())[g]:
+                            max = list(win[1].values())[g] 
+                            person = list(win[1].keys())[g]
+                    print("From the remaining", len(list(newRound[0].keys())), "players, the winner is",person, "with", max, "total victories.")
+                else:
+                    print("We have a winner!")
+                    if max < list(win[1].values())[0]:
+                        max = list(win[1].values())[0]
+                    print("The winner is", list(win[1].keys())[0], "with total victories", max)
             else:
-                print("We have a winner!")
-                if max < list(win[1].values())[0]:
-                    max = list(win[1].values())[0]
-                print("The winner is", list(win[1].keys())[0], "with total victories", max)
-        else:
-            print("Alright, the game is terminated. Bye bye!")
+                print("Alright. Bye bye!")
+        
+
+
 
 #Main Program
 n = int(input("How many players ? "))
 print("Let's personalize your game a little bit.") #Via object programming techniques, all the inializations are done automaticly
 players = initPlayers(n)
+newPlayers = copy.deepcopy(players)
 data = initScores(players,v=0)
-completeGame(data, players)
+id = 1
+while id > 0:
+    completeGame(data, players)
+    print("==========")
+    choice = str(input("Do you want to play again ? yes/no: "))
+    if choice == "no":
+        id = -1
+    elif choice == "yes":
+        players = copy.deepcopy(newPlayers)
+        data = initScores(players,v=0)
+        id = id + 1
+    else:
+        print("I do not understand. Please type yes or no.")
+        choice = str(input("yes/no:")) 
+print("Game is terminated")
